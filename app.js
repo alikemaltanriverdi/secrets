@@ -73,20 +73,12 @@ passport.use(new GoogleStrategy({
     }
 ));
 
-
+//Initial Welcome Page Render
 app.get("/",function(req,res){
     res.render("home");
 });
-//Google Authentication Page
-app.get("/auth/google",
-    passport.authenticate("google", {scope: ["profile"]})
-    );
-app.get("/auth/google/secrets",
-    passport.authenticate("google",{failureRedirect:"/login"}), function(req,res){
-        //Successfull login redirects to secrets
-        res.redirect("/secrets");
-    }
-);
+
+// Secret submitting page rendering
 app.get("/submit",function (req,res) {
     if (req.isAuthenticated()) {
         res.render("submit");
@@ -95,9 +87,9 @@ app.get("/submit",function (req,res) {
     }
   });
 
+//New Secret Entry
 app.post("/submit",function (req,res) {  
     const submittedSecret= req.body.secret;
-
     // console.log(req.user.id);
 
     User.findById(req.user.id, function (err, foundUser) {
@@ -120,6 +112,19 @@ app.get("/login", function (req, res) {
 app.get("/register", function (req, res) {
     res.render("register");
 });
+
+//Google Authentication Page
+app.get("/auth/google",
+    passport.authenticate("google", { scope: ["profile"] })
+);
+app.get("/auth/google/secrets",
+    passport.authenticate("google", { failureRedirect: "/login" }), function (req, res) {
+        //Successfull login redirects to secrets
+        res.redirect("/secrets");
+    }
+);
+
+//Main Page Rendering
 app.get("/secrets",function (req,res) {
      User.find({"secret": {$ne:null}}, function (err, foundUsers) {
         if(err){console.log(err);}
